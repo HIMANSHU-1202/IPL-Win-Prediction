@@ -1,0 +1,71 @@
+import pandas as pd
+
+
+
+def result(row):
+    return 1 if row['batting_team']==row['winner'] else 0
+
+#Overall Teams information -:
+
+def get_teams_info(data):
+    # Get unique team names
+    teams = list(set(data['team1']).union(set(data['team2'])))
+
+    # Initialize empty lists for each column in the dataframe
+    matches_played = []
+    total_wins = []
+    total_losses = []
+    win_percentage = []
+
+    # Loop through each team
+    for team in teams:
+        # Count the number of matches played by the team
+        matches = len(data[(data['team1'] == team) | (data['team2'] == team)])
+
+        # Count the number of wins and losses by the team
+        wins = len(data[(data['winner'] == team)])
+        losses = matches - wins
+
+        # Calculate the win percentage
+        win_percent = (wins / matches) * 100 if matches > 0 else 0
+
+        # Append the values to the respective lists
+        matches_played.append(matches)
+        total_wins.append(wins)
+        total_losses.append(losses)
+        win_percentage.append(win_percent)
+
+    # Create the dataframe
+    teams_info = pd.DataFrame({
+        'Team': teams,
+        'Matches Played': matches_played,
+        'Total Wins': total_wins,
+        'Total Losses': total_losses,
+        'Win Percentage': win_percentage
+    })
+
+    return teams_info
+
+# information about selected team -:
+def sel_team_info(df,team_name):
+    # Filter the match dataframe to get all matches played by the selected team
+    team_matches = df[(df['team1'] == team_name) | (df['team2'] == team_name)]
+
+    # Get the total number of matches played by the team
+    total_matches = len(team_matches)
+
+    # Get the total number of matches won by the team
+    total_wins = len(team_matches[team_matches['winner'] == team_name])
+
+    # Get the total number of matches lost by the team
+    total_losses = len(team_matches[team_matches['winner'] != team_name])
+
+    # Get the total number of matches tied by the team
+    total_ties = len(team_matches[team_matches['result'] == 'tie'])
+
+    # Print the team information
+    return (('Team Name:', team_name),
+            ('Total Matches Played:', total_matches),
+            ('Total Matches Won:', total_wins),
+            ('Total Matches Lost:', total_losses),
+            ('Total Matches Tied:', total_ties))
